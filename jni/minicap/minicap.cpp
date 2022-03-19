@@ -284,7 +284,7 @@ main(int argc, char* argv[]) {
   // Start Android's thread pool so that it will be able to serve our requests.
   minicap_start_thread_pool();
 
-  if (showInfo) {
+  // if (showInfo) {
     Minicap::DisplayInfo info;
 
     if (minicap_try_get_display_info(displayId, &info) != 0) {
@@ -326,8 +326,8 @@ main(int argc, char* argv[]) {
               << "    \"rotation\": " << rotation            << std::endl
               << "}"                                         << std::endl;
 
-    return EXIT_SUCCESS;
-  }
+    // return EXIT_SUCCESS;
+  // }
 
   proj.forceMaximumSize();
   proj.forceAspectRatio();
