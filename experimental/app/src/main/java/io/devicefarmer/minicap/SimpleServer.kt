@@ -24,23 +24,33 @@ import java.io.IOException
 /**
  * Minimalist "server" to bootstrap development
  */
-class SimpleServer(private val socket: String, private val listener: Listener) {
+class SimpleServer(private val socket: String, private val listener: Listener): Thread()  {
     companion object {
-        val log: Logger = LoggerFactory.getLogger(Main::class.java.simpleName)
+        val log: Logger = LoggerFactory.getLogger(SimpleServer::class.java.simpleName)
     }
 
     interface Listener {
         fun onConnection(socket: LocalSocket)
     }
 
-    fun start() {
+    override fun run() {
+        val tag = "::run"
         try {
             val serverSocket = LocalServerSocket(socket)
-            log.info("Listening on socket : ${socket}")
-            val clientSocket: LocalSocket = serverSocket.accept()
-            listener.onConnection(clientSocket)
+            while (true) {
+                try {
+                    log.info("$tag, Listening on socket : $socket")
+                    val clientSocket = serverSocket.accept()
+                    log.info("$tag, client connected, clientSocket = $clientSocket")
+                    listener.onConnection(clientSocket)
+                } catch (e: IOException) {
+                    log.error("$tag, error waiting connection", e)
+                    e.printStackTrace()
+                }
+            }
+            serverSocket.close()
         } catch (e: IOException) {
-            log.error("error waiting connection", e)
+            log.error("$tag, error waiting connection", e)
         }
     }
 }

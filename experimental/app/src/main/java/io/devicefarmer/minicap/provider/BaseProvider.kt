@@ -28,6 +28,7 @@ import io.devicefarmer.minicap.utils.DisplayManagerGlobal
 import org.slf4j.LoggerFactory
 import java.io.OutputStream
 import java.io.PrintStream
+import java.lang.Exception
 import java.nio.ByteBuffer
 
 /**
@@ -82,13 +83,19 @@ abstract class BaseProvider(private val displayId: Int, private val targetSize: 
     }
 
     override fun onImageAvailable(reader: ImageReader) {
+        val tag = "::onImageAvailable"
+
         val image = reader.acquireLatestImage()
         val currentTime = System.currentTimeMillis()
         if (image != null) {
             if (currentTime - previousTimeStamp > framePeriodMs) {
                 previousTimeStamp = currentTime
                 encode(image, quality, clientOutput.imageBuffer)
-                clientOutput.send()
+                try {
+                    clientOutput.send()
+                } catch (e: Exception) {
+                    log.warn("$tag, cannot send frame, e = ${e.message}")
+                }
             } else {
                 log.warn("skipping frame ($currentTime/$previousTimeStamp)")
             }
